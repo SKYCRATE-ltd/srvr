@@ -1,1 +1,28 @@
-{}
+{
+  "name": "srvr",
+  "version": "1.0.0",
+  "description": "easy-peasy server-squeezy with nginx and nodejs",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SKYCRATE-ltd/srvr.git"
+  },
+  "keywords": [
+    "nginx",
+    "server"
+  ],
+  "author": "Graham Robertson | SKYCRATE ltd",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/SKYCRATE-ltd/srvr/issues"
+  },
+  "homepage": "https://github.com/SKYCRATE-ltd/srvr#readme",
+  "dependencies": {
+    "hosts": "github:SKYCRATE-ltd/DNS",
+    "termite": "github:SKYCRATE-ltd/termite"
+  }
+}
