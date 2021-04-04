@@ -1,0 +1,14 @@
+server {
+	listen 80;
+	listen [::]:80;
+
+	# TODO: make a template of this, bro.
+	server_name srvr.local;
+
+	root /var/www/srvr.local/public;
+	index index.html;
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+}
