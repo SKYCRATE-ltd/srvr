@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# TODO: generate this file... termite should handle it!
+SCRIPT=/usr/local/bin/srvr
+cat > $SCRIPT <<EOM
+#!/bin/bash
+
+node $(pwd)/srvr.js \$@
+
+EOM
+chmod +x $SCRIPT
+# And that should do it!
+echo "INSTALLED @ $SCRIPT"

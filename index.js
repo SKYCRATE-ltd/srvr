@@ -32,6 +32,10 @@ export default Program({
 	},
 	init(domain, dir = '.') {
 		dir = resolve_dir(dir);
+		
+		this.header(`SRVR: local dev config`);
+		this.info(`${dir}/etc/${domain}`);
+
 		write(`${dir}/etc/${domain}`, `
 # DOMAIN: (https|http)://${domain}
 # SOURCE: ${dir}
@@ -54,6 +58,8 @@ server {
 	# TODO: https stuff for product (certbot?)
 }
 `);
+		this.hr();
+		this.done();
 		this.exit(); // let's just bail here.
 	},
 	list() {
