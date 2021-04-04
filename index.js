@@ -59,7 +59,7 @@ server {
 `);
 	},
 	list() {
-		return this.list(AVAILABLE.map(
+		return this.header('DOMAINS INSTALLED:') + this.list(AVAILABLE.map(
 			site => `[${ENABLED.includes(site) ? 'X' : ' ' }] ${site}`
 		));
 	},
