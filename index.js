@@ -57,6 +57,7 @@ server {
 	# TODO: https stuff for product (certbot?)
 }
 `);
+		this.exit(); // let's just bail here.
 	},
 	list() {
 		return this.header('DOMAINS INSTALLED:') + this.list(AVAILABLE.map(
