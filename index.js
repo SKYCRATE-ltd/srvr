@@ -82,33 +82,41 @@ server {
 		this.pass('enable', domain);
 	},
 	remove(domain) {
+		this.header(`REMOVE: ${domain}`);
+
 		this.warn(`deleting ${domain} from ${WWW}`);
 		del(`${WWW}/${domain}`);
 
 		this.pass('disable', domain);
+		this.hr();
 
-		this.warn(`deleting `);
+		this.warn(`removing site configuration:`);
 		del(`${AVAILABLE_DIR}/${domain}`);
 	},
 	enable(domain) {
+		this.header(`ENABLE: ${domain}`);
+
 		this.log(`mapping ${domain} config to ${ENABLED_DIR}`);
 		map(`${AVAILABLE_DIR}/${domain}`, `${ENABLED_DIR}/${domain}`);
 		
 		this.log(`DNS: adding ${domain} to hosts file...`);
-		this.hr('∙');
+		this.hr();
 		DNS('add', IP, domain);
 	},
 	disable(domain) {
+		this.header(`DISABLE: ${domain}`)
+
 		this.warn(`deleting ${domain} from ${ENABLED_DIR}`);
 		del(`${ENABLED_DIR}/${domain}`);
 		
 		this.warn(`removing ${domain} => ${IP} from hosts file...`);
-		this.hr('∙');
+		this.hr();
 		DNS('remove', IP, domain);
 	},
 	["@end"](cmd) {
 		if (cmd !== "list")
-			this.info('resetting nginx server') && exec(`nginx -s reload`);
+			this.hr() && this.info('resetting nginx server') &&
+				exec(`nginx -s reload`) || this.done();
 	}
 });
 // Rightr, so this is what we finish this afternoon, then we get
