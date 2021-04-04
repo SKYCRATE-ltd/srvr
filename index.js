@@ -3,9 +3,6 @@ import {
 	copy, map, del, write,
 	is_sudo, exists, exec
 } from "computer";
-import {
-	EOL
-} from "os";
 import Program from "termite";
 import DNS from "hosts";
 
@@ -60,39 +57,58 @@ server {
 		this.exit(); // let's just bail here.
 	},
 	list() {
-		return this.header('DOMAINS INSTALLED:') + this.list(AVAILABLE.map(
+		return this.header('SRVR: sites available') + this.list(AVAILABLE.map(
 			site => `[${ENABLED.includes(site) ? 'X' : ' ' }] ${site}`
 		));
 	},
 	add(domain, dir = '.') {
 		dir = resolve_dir(dir);
-
+		
+		this.header(`SRVR: ${domain}`);
+		this.list([
+			`SOURCE: ${dir}`,
+			`TARGET: ${WWW}`
+		]);
 		const config = `${dir}/etc/${domain}`;
 		if (!exists(config))
 			return this.error(`configuration '${config}' not found`);
 		
+		this.log(`mapping project to ${WWW}/${domain}`);
 		map(dir, `${WWW}/${domain}`);
+		
+		this.log(`copying ${dir}/etc/${domain} to ${AVAILABLE_DIR}`);
 		copy(config, AVAILABLE_DIR);
 
 		this.pass('enable', domain);
 	},
 	remove(domain) {
+		this.warn(`deleting ${domain} from ${WWW}`);
 		del(`${WWW}/${domain}`);
-		del(`${AVAILABLE_DIR}/${domain}`);
 
 		this.pass('disable', domain);
+
+		this.warn(`deleting `);
+		del(`${AVAILABLE_DIR}/${domain}`);
 	},
 	enable(domain) {
+		this.log(`mapping ${domain} config to ${ENABLED_DIR}`);
 		map(`${AVAILABLE_DIR}/${domain}`, `${ENABLED_DIR}/${domain}`);
+		
+		this.log(`DNS: adding ${domain} to hosts file...`);
+		this.hr('∙');
 		DNS('add', IP, domain);
 	},
 	disable(domain) {
+		this.warn(`deleting ${domain} from ${ENABLED_DIR}`);
 		del(`${ENABLED_DIR}/${domain}`);
+		
+		this.warn(`removing ${domain} => ${IP} from hosts file...`);
+		this.hr('∙');
 		DNS('remove', IP, domain);
 	},
 	["@end"](cmd) {
 		if (cmd !== "list")
-			exec(`nginx -s reload`);
+			this.info('resetting nginx server') && exec(`nginx -s reload`);
 	}
 });
 // Rightr, so this is what we finish this afternoon, then we get
