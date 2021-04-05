@@ -1,11 +1,15 @@
 #!/bin/bash
 
 # TODO: generate this file... termite should handle it!
-SCRIPT=/usr/local/bin/srvr
+if ! [ -d node_modules/ ]; then
+	npm i
+fi
+
+SCRIPT=${1:-/usr/local/bin}/srvr
 cat > $SCRIPT <<EOM
 #!/bin/bash
 
-node $(pwd)/srvr.js \$@
+$(pwd)/srvr.js \$@
 
 EOM
 chmod +x $SCRIPT
