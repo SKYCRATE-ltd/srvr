@@ -32,7 +32,7 @@ export default Program({
 	},
 	init(domain, dir = '.') {
 		dir = resolve_dir(dir);
-		
+
 		this.header(`SRVR: local dev config`);
 		this.info(`${dir}/etc/${domain}`);
 
@@ -79,8 +79,10 @@ server {
 		if (!exists(config))
 			return this.error(`configuration '${config}' not found`);
 		
-		this.log(`mapping project to ${WWW}/${domain}`);
-		map(dir, `${WWW}/${domain}`);
+		if (dir !== `${WWW}/${domain}`) {
+			this.log(`mapping project to ${WWW}/${domain}`);
+			map(dir, `${WWW}/${domain}`);
+		}
 		
 		this.log(`copying ${dir}/etc/${domain} to ${AVAILABLE_DIR}`);
 		copy(config, AVAILABLE_DIR);
@@ -90,8 +92,10 @@ server {
 	remove(domain) {
 		this.header(`REMOVE: ${domain}`);
 
-		this.warn(`deleting ${domain} from ${WWW}`);
-		del(`${WWW}/${domain}`);
+		if (exec(`if [ -L ${WWW}/${domain} ]; then echo true; fi`)) {
+			this.warn(`deleting ${domain} from ${WWW}`);
+			del(`${WWW}/${domain}`);
+		}
 
 		this.pass('disable', domain);
 		this.hr();
