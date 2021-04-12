@@ -5,6 +5,8 @@ if ! [ -d node_modules/ ]; then
 	npm i
 fi
 
+etc/rootCA.pem
+
 SCRIPT=${1:-/usr/local/bin}/srvr
 cat > $SCRIPT <<EOM
 #!/bin/bash

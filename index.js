@@ -67,7 +67,7 @@ server {
 			site => `[${ENABLED.includes(site) ? 'X' : ' ' }] ${site}`
 		));
 	},
-	add(domain, dir = '.') {
+	add(domain, environment = 'local', dir = '.') {
 		dir = resolve_dir(dir);
 		
 		this.header(`SRVR: ${domain}`);
@@ -80,6 +80,7 @@ server {
 			return this.error(`configuration '${config}' not found`);
 		
 		if (dir !== `${WWW}/${domain}`) {
+			// That means we need to perform an MKCERT
 			this.log(`mapping project to ${WWW}/${domain}`);
 			map(dir, `${WWW}/${domain}`);
 		}
@@ -88,6 +89,11 @@ server {
 		copy(config, AVAILABLE_DIR);
 
 		this.pass('enable', domain);
+
+		// TODO: finish this... change to certify
+		if (environment === "local")
+			exec(`cd ${dir}/etc &&  ${domain} *.${domain}`);
+
 	},
 	remove(domain) {
 		this.header(`REMOVE: ${domain}`);
