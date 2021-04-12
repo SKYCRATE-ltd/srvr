@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/SKYCRATE-ltd/srvr#readme",
   "dependencies": {
+    "certify": "github:SKYCRATE-ltd/certify",
     "hosts": "github:SKYCRATE-ltd/DNS",
     "termite": "github:SKYCRATE-ltd/termite"
   }

@@ -5,6 +5,7 @@ import {
 } from "computer";
 import Program from "termite";
 import DNS from "hosts";
+import certify from "certify";
 
 // HEY! Should we import the DNS program? It's actually
 // kind of a good idea! We use it to set 'oor domains!
@@ -90,9 +91,10 @@ server {
 
 		this.pass('enable', domain);
 
-		// TODO: finish this... change to certify
-		if (environment === "local")
-			exec(`cd ${dir}/etc &&  ${domain} *.${domain}`);
+		if (environment === 'local') {
+			this.log('Generating website certificate, baby...');
+			certify('create', domain, '*.' + domain);
+		}
 
 	},
 	remove(domain) {
