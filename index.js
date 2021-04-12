@@ -24,18 +24,21 @@ export default Program({
 	},
 	["@init"](cmd, domain) {
 		if (cmd !== "list") {
-			if (cmd !== 'init' && !is_sudo())
+			if (cmd !== 'create' && !is_sudo())
 				return this.error(`please run '${cmd}' as sudo.`);
 
 			if (!domain)
 				return this.error('no domain name passed.');
 		}
 	},
-	init(domain, dir = '.') {
+	create(domain, dir = '.') {
 		dir = resolve_dir(dir);
 
 		this.header(`SRVR: local dev config`);
 		this.info(`${dir}/etc/${domain}`);
+
+		// Generate keys... (if local!)
+		// certbot should be able to override this.
 
 		write(`${dir}/etc/${domain}`, `
 # DOMAIN: (https|http)://${domain}
@@ -43,22 +46,38 @@ export default Program({
 # generated on ${new Date().toLocaleString().replace(', ', ' @ ')}
 
 server {
-	listen 80;
-	listen [::]:80;
+	listen 443 ssl;
 
+	ssl_certificate ${WWW}/${domain}/etc/${domain}+1.pem;
+	ssl_certificate_key ${WWW}/${domain}/etc/${domain}+1-key.pem;
+
+	charset utf-8;
 	server_name ${domain};
-
 	root ${WWW}/${domain}/public;
 	index index.html;
 
 	location / {
 		try_files $uri $uri/ =404;
 	}
+}
 
-	# TODO: https stuff for LAN (mkcert)
-	# TODO: https stuff for product (certbot?)
+server {
+	if ($host = ${domain}) {
+		return 301 https://$host$request_uri;
+	}
+
+	server_name ${domain};
+	listen 80;
+	listen [::]:80;
+	return 404;
 }
 `);
+		if (domain.endsWith('.dev')) {
+			this.log('Generating local website certificate, baby...');
+			// we might need to ensure we're in the right folder here...
+			// OR, pass an output... that might make more sense...
+			certify('create', domain, '*.' + domain);
+		}
 		this.hr();
 		this.done();
 		this.exit(); // let's just bail here.
@@ -68,7 +87,7 @@ server {
 			site => `[${ENABLED.includes(site) ? 'X' : ' ' }] ${site}`
 		));
 	},
-	add(domain, environment = 'local', dir = '.') {
+	add(domain, dir = '.') {
 		dir = resolve_dir(dir);
 		
 		this.header(`SRVR: ${domain}`);
@@ -90,11 +109,6 @@ server {
 		copy(config, AVAILABLE_DIR);
 
 		this.pass('enable', domain);
-
-		if (environment === 'local') {
-			this.log('Generating website certificate, baby...');
-			certify('create', domain, '*.' + domain);
-		}
 
 	},
 	remove(domain) {
